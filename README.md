@@ -6,5 +6,6 @@ The aim is to find the best trajectory for a Mars Lander to land on a flat surfa
 
 We will use a genetic algorithm to solve the problem.
 
-## This branch is only used for the final cleaned-up and functional code
+
+## /!\ This branch is only used for testing purposes
 
