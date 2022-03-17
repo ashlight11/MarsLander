@@ -1,5 +1,5 @@
 from affichage import construction_plateau, affichage
-from AlgoGene import newSimulation
+from AlgoGene import newSimulation,evaluation
 import math
 import numpy as np
 
@@ -22,17 +22,17 @@ def init(plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power):
 def check_contraintes(dict_varaible,plateau):
     crash = False
     loop = 0
+    if dict_varaible['X'] <= 0 or dict_varaible['X'] > 7000:
+        print('erreur X')
+        return False
+    elif dict_varaible['Y'] <= 0 or dict_varaible['Y'] > 3000:
+        print('erreur Y')
+        return False
     coordonnee = plateau[0]
     coordonnee = np.array(coordonnee)
     var = np.where(coordonnee == int(dict_varaible['X']))
     if dict_varaible['Y'] < plateau[1][var[0][0]]:
         print('crash')
-        return False
-    if dict_varaible['X'] < 0 or dict_varaible['X'] > 7000:
-        print('erreur X')
-        return False
-    elif dict_varaible['Y'] < 0 or dict_varaible['Y'] > 3000:
-        print('erreur Y')
         return False
     elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
         print('erreur hSpeed')
@@ -77,17 +77,18 @@ def simulation(dict_varaible,new_power,new_rotate):
     dict_varaible['periode'] = dict_varaible['periode']+1
     return dict_varaible
 
-def lancement(save_try,plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power):
+def lancement(save_try,plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power,random,nb_tours,best_score):
     dico_atterissage = init(plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power)
     tracex = []
     tracey = []
     loop = 0
+
     while check_contraintes(dico_atterissage[loop],dico_atterissage['plateau']):
-        new_rotate,new_power = newSimulation(save_try)
-        dico_atterissage[loop+1] = simulation(dico_atterissage[loop],new_power,new_rotate)
+        new_rotate,new_power = newSimulation(save_try,random,nb_tours,loop,best_score)
+        dico_atterissage[loop+1] = simulation(dico_atterissage[loop],new_power,new_rotate).copy()
         tracey.append(dico_atterissage[loop]['Y'])
         tracex.append(dico_atterissage[loop]['X'])
         affichage(dico_atterissage,tracex,tracey)
         loop += 1
-    return 0,dico_atterissage
+    return evaluation(dico_atterissage),dico_atterissage
 
