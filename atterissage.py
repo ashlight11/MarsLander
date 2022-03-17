@@ -1,6 +1,7 @@
 from affichage import construction_plateau, affichage
 from AlgoGene import newSimulation
 import math
+import numpy as np
 
 
 def init(plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power):
@@ -19,7 +20,15 @@ def init(plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power):
     return dict_global
 
 def check_contraintes(dict_varaible,plateau):
-    if dict_varaible['X'] < plateau[int(dict_varaible['X'])] or dict_varaible['X'] > 7000:
+    crash = False
+    loop = 0
+    coordonnee = plateau[0]
+    coordonnee = np.array(coordonnee)
+    var = np.where(coordonnee == int(dict_varaible['X']))
+    if dict_varaible['Y'] < plateau[1][var[0][0]]:
+        print('crash')
+        return False
+    if dict_varaible['X'] < 0 or dict_varaible['X'] > 7000:
         print('erreur X')
         return False
     elif dict_varaible['Y'] < 0 or dict_varaible['Y'] > 3000:
