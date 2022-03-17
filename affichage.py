@@ -22,14 +22,18 @@ def construction_plateau(plateau_def):
     return plateau
 
 
-def affichage(data,X,Y,trace):
+def affichage(data,tracex,tracey):
     plateau = data['plateau']
+    X = data[len(data)-2]['X']
+    Y = data[len(data)-2]['Y']
     plt.xlim(0, 7000)
     plt.ylim(0, 3000)
     plt.plot(plateau,color="blue")
-    plt.plot(X, Y, marker="o", color="red")
-    plt.plot(trace,color="red")
-    plt.show()
+    #plt.plot(X, Y, marker="o", color="red")
+    plt.plot(tracex,tracey,color="red")
+    plt.ion()
+    plt.draw()
+    plt.pause(0.01)
 
 
     
