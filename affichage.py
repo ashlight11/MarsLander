@@ -26,9 +26,9 @@ def affichage(data,X,Y,trace):
     plateau = data['plateau']
     plt.xlim(0, 7000)
     plt.ylim(0, 3000)
-    plt.plot(plateau)
+    plt.plot(plateau,color="blue")
     plt.plot(X, Y, marker="o", color="red")
-    plt.plot(trace)
+    plt.plot(trace,color="red")
     plt.show()
 
 
