@@ -1,14 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from affichage import affichage,construction_plateau
+from affichage import affichage, construction_plateau
 
 # Press Maj+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import math
 import scipy
 from scipy import integrate
-
 
 
 def next_periode(attributs, periode_actuelle):
@@ -31,7 +30,6 @@ def contraintes_attribution(anciens, nouveaux):
         return False
     else:
         return True
-
 
 
 def simulation():
@@ -75,7 +73,7 @@ def estimateNewValues(input_values, output_values):
         new_y = y + (new_vs + vs) / 2
         new_fuel = f - new_power
 
-        print("Turn ", i, " ;",  new_x, new_y, new_hs, new_vs, new_fuel, new_r, new_power)
+        print("Turn ", i, " ;", new_x, new_y, new_hs, new_vs, new_fuel, new_r, new_power)
         print("\n")
 
         x = new_x
@@ -96,11 +94,6 @@ def find_landing_area(ground):
             end_flat = ground[index + 1]
 
     return begin_flat, end_flat
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    simulation()
 
 
 def initialisation():
@@ -164,12 +157,9 @@ def check_contraintes(attributs):
         return True
 
 
-def __main__():
-    data = initialisation()
-    affichage(data,0,0,0)
-
-
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    __main__()
-
+    #simulation()
+    import affichage
+    ground = [(0, 1500), (1000, 2000), (2000, 500), (3500, 500), (5000, 1500), (6999, 1000)]
+    affichage.construction_plateau_bis(ground)

@@ -1,6 +1,7 @@
 from atterissage import lancement
 import matplotlib.pyplot as plt
 
+
 def main():
     save_best_try = {}
     best_score = 10000
@@ -16,21 +17,25 @@ def main():
         fuel = 1000
         rotate = 90
         power = 0
-        if i == 0: random =True
+        if i == 0:
+            random = True
         else:
             random = False
-        taux_tour = i/nb_try
+        taux_tour = i / nb_try
         taux_tour = 0.5
         for j in range(nb_aterissage):
-            score_obtenu,aterissage = lancement(save_try,plateau_def,X,Y,hSpeed,vSpeed,fuel,rotate,power,random,taux_tour,best_score)
+            score_obtenu, aterissage = lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power,
+                                                 random, taux_tour, best_score)
             save_try[score_obtenu] = aterissage
         new_dic = sorted(save_try.items(), key=lambda t: t[0])
         save_best_try = {}
-        for key,value in new_dic:
+        for key, value in new_dic:
             save_best_try[key] = value
             best_score = key
             break
         plt.close('all')
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
