@@ -51,33 +51,39 @@ def simulation():
 
     begin_flat, end_flat = find_landing_area(ground)
 
-    x, y, hs, vs, f, r, p = [int(i) for i in input_second.split()]
+    estimateNewValues(input_first, output_values)
+
+
+def estimateNewValues(input_values, output_values):
+    x, y, hs, vs, f, r, p = [int(i) for i in input_values.split()]
     rotate, power = [int(i) for i in output_values.split()]
-    print(x, y, hs, vs, f, r, p)
-    print(rotate, power)
-    g = -3.711
-    new_power = p + power if power <= 1 else p + 1
-    new_r = r + rotate if abs(rotate) < 15 else r + math.copysign(15, rotate)
 
-    new_vs = vs + (g + new_power) * math.sin(new_r * math.pi / 180)
-    # new_vs = vs + g + new_power
+    for i in range(2):
+        print(x, y, hs, vs, f, r, p)
+        print(rotate, power)
+        g = -3.711
+        new_power = p + power if power <= 1 else p + 1
 
-    new_hs = hs + new_vs * math.cos(new_r * math.pi / 180)
+        new_r = r + rotate if abs(rotate) < 15 else r + math.copysign(15, rotate)
 
-    new_x = x + new_hs
-    new_y = y + new_vs
-    new_fuel = f - new_power
+        new_vs = vs + g + new_power * math.cos(new_r * math.pi / 180)
 
-    print(new_x, new_y, new_hs, new_vs, new_fuel, new_r, new_power)
+        new_hs = hs - new_power * math.sin(new_r * math.pi / 180)
 
-    new_vs = round(new_vs)
-    new_hs = round(new_hs)
-    new_r = round(new_r)
+        new_x = x + (new_hs + hs) / 2
+        new_y = y + (new_vs + vs) / 2
+        new_fuel = f - new_power
 
-    new_x = round(x + new_hs)
-    new_y = round(y + new_vs)
+        print("Turn ", i, " ;",  new_x, new_y, new_hs, new_vs, new_fuel, new_r, new_power)
+        print("\n")
 
-    print(new_x, new_y, new_hs, new_vs, new_fuel, new_r, new_power)
+        x = new_x
+        y = new_y
+        hs = new_hs
+        vs = new_vs
+        f = new_fuel
+        r = new_r
+        p = new_power
 
 
 def find_landing_area(ground):
@@ -155,5 +161,3 @@ def check_contraintes(attributs):
         return False
     else:
         return True
-
-
