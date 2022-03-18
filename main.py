@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from affichage import affichage,construction_plateau
 
 # Press Maj+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -6,9 +9,6 @@ import math
 import scipy
 from scipy import integrate
 
-
-def __main__():
-    simulation()
 
 
 def next_periode(attributs, periode_actuelle):
@@ -31,6 +31,7 @@ def contraintes_attribution(anciens, nouveaux):
         return False
     else:
         return True
+
 
 
 def simulation():
@@ -161,3 +162,14 @@ def check_contraintes(attributs):
         return False
     else:
         return True
+
+
+def __main__():
+    data = initialisation()
+    affichage(data,0,0,0)
+
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    __main__()
+
