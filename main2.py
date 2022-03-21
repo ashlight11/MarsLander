@@ -1,5 +1,6 @@
 from atterissage import lancement
 import matplotlib.pyplot as plt
+import time
 
 
 def main():
@@ -40,4 +41,6 @@ def main():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    start_time = time.time()
     main()
+    print("--- %s seconds ---" % (time.time() - start_time))

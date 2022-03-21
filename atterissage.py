@@ -26,9 +26,7 @@ def init(plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power):
 
 
 def check_contraintes(dict_varaible, plateau):
-    crash = False
-    loop = 0
-    print("check : ", dict_varaible)
+    # print("check : ", dict_varaible)
     if dict_varaible['X'] <= 0 or dict_varaible['X'] > 7000:
         print('erreur X')
         return False
@@ -39,7 +37,7 @@ def check_contraintes(dict_varaible, plateau):
     coordonnee = np.array(coordonnee)
     var = np.where(coordonnee == int(dict_varaible['X']))
     if dict_varaible['Y'] < plateau[1][var[0][0]]:
-        print('crash en y :', dict_varaible['Y'], "; limite : ", plateau[1][var[0][0]])
+        print('crash')
         return False
     elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
         print('erreur hSpeed')
@@ -62,7 +60,7 @@ def check_contraintes(dict_varaible, plateau):
         # rajouter vérif de si on se pose de l'angle et la vitesse
 
 
-def check_contraintesV2(simulationEnCours: MarsLanderSim):
+'''def check_contraintesV2(simulationEnCours: MarsLanderSim):
     crash = False
     loop = 0
     if simulationEnCours.x <= 0 or simulationEnCours.x > 7000:
@@ -95,6 +93,7 @@ def check_contraintesV2(simulationEnCours: MarsLanderSim):
     else:
         return True
         # rajouter vérif de si on se pose de l'angle et la vitesse
+'''
 
 
 def simulation(dict_varaible, new_power, new_rotate):
@@ -217,7 +216,6 @@ def lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power, 
         tracex.append(dico_atterissage[loop]['X'])
         # affichage(dico_atterissage, tracex, tracey)
         loop += 1
-    print(loop)
     return evaluation(dico_atterissage), dico_atterissage
 
 
@@ -230,13 +228,14 @@ def lancementV2(simulationEnCours: MarsLanderSim, save_try):
         new_rotate, new_power = newSimulationV2(save_try, loop, sim)
         sim = simulationV2(sim, new_power, new_rotate)
         sim.sim_to_dict(loop + 1)
-        #print(sim.x, sim.y, sim.hs, sim.vs, sim.fuel, sim.rotate, sim.power)
-        #print(sim.dico_atterissage[loop])
+        # print(sim.x, sim.y, sim.hs, sim.vs, sim.fuel, sim.rotate, sim.power)
+        # print(sim.dico_atterissage[loop])
         tracey.append(sim.y)
         tracex.append(sim.x)
-        affichageV2(sim.plateau, tracex, tracey)
+        # affichageV2(sim.plateau, tracex, tracey)
         loop += 1
     return evaluationV2(sim), sim
+
 
 def zoneAtterissage(plateau):
     begin_flat = 0

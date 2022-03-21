@@ -1,10 +1,11 @@
 from matplotlib import pyplot as plt
 from affichage import construction_plateau_bis
 import atterissage as att
+import time
 
 
 class MarsLanderSim:
-    def __init__(self, plateau, init_data, nb_essais=2, nb_atterissages=5, taux=0.5):
+    def __init__(self, plateau, init_data, nb_essais=10, nb_atterissages=5, taux=0.5):
 
         self.plateau = construction_plateau_bis(plateau)
         self.best_try = {}
@@ -60,4 +61,6 @@ class MarsLanderSim:
 if __name__ == '__main__':
     input_first = "5000 2500 -50 0 1000 90 0"  # (X Y hSpeed vSpeed fuel rotate power)
     ground = [(0, 1500), (1000, 2000), (2000, 500), (3500, 500), (5000, 1500), (6999, 1000)]
+    start_time = time.time()
     simulation = MarsLanderSim(ground, input_first)
+    print("--- %s seconds ---" % (time.time() - start_time))
