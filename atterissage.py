@@ -51,8 +51,8 @@ def check_contraintes(dict_varaible, plateau):
     elif dict_varaible['rotate'] < -90 or dict_varaible['rotate'] > 90:
         print('erreur rotate')
         return False
-    elif dict_varaible['power'] < 0 or dict_varaible[
-        'power'] > 4:  # or dict_varaible['surfaceN'] < 2 or dict_varaible['surfaceN'] > 30
+    elif dict_varaible['power'] < 0 or dict_varaible['power'] > 4:
+        # or dict_varaible['surfaceN'] < 2 or dict_varaible['surfaceN'] > 30
         print('erreur power')
         return False
     else:
@@ -140,10 +140,11 @@ def simulationCorrigee(dict, power, rotate):
     else:
         new_power = p - 1
 
-    if abs(r - rotate) < 15 or r == rotate:
+    if abs(rotate) < 15 or r == rotate:
         new_r = rotate
     else:
         new_r = r + math.copysign(15, rotate)
+
     new_r = math.copysign(90, new_r) if (abs(new_r) > 90) else new_r
 
     new_vs = vs + g + new_power * math.cos(new_r * math.pi / 180)
@@ -232,7 +233,7 @@ def lancementV2(simulationEnCours: MarsLanderSim, save_try):
         # print(sim.dico_atterissage[loop])
         tracey.append(sim.y)
         tracex.append(sim.x)
-        # affichageV2(sim.plateau, tracex, tracey)
+        affichageV2(sim.plateau, tracex, tracey)
         loop += 1
     return evaluationV2(sim), sim
 

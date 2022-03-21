@@ -41,6 +41,7 @@ class MarsLanderSim:
                 self.best_try[key] = value
                 self.best_score = key
                 break
+            print("best : ", self.best_score)
             plt.close('all')
 
     def perform_init(self, init_data):

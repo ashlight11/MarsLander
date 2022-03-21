@@ -52,7 +52,7 @@ def evaluationV2(simulationEnCours: MarsLanderSim):
     coordonnee = np.array(coordonnee)
     var = np.where(coordonnee == int(simulationEnCours.x))
     if simulationEnCours.y < plateau[1][var[0][0]]:
-        distance_altitude_point = 0
+        distance_altitude_point = 500
     else:
         distance_altitude_point = abs(plateau[1][var[0][0]] - simulationEnCours.y)
     # créer une fonction pour trouver le début et la fin de la zone d'aterissage par rapport au tableau plateau
