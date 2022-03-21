@@ -3,7 +3,7 @@ import numpy as np
 
 import MarsLanderSim
 from AlgoGene import newSimulation, evaluation, newSimulationV2, evaluationV2
-from affichage import construction_plateau, affichage, affichageV2
+from affichage import construction_plateau, affichage, affichageV2, construction_plateau_bis
 
 
 def init(plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power):
@@ -18,6 +18,9 @@ def init(plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power):
     dict_varaible['rotate'] = rotate
     dict_varaible['power'] = power
     dict_global['plateau'] = construction_plateau(plateau_def)
+    # TODO : regarder cet ajout
+    # la fonction "bis" permet de construire le plateau avec le format de données en entrée de codingame
+    # dict_global['plateau'] = construction_plateau_bis(plateau_def)
     dict_global[0] = dict_varaible
     return dict_global
 

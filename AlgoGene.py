@@ -20,6 +20,13 @@ def evaluation(dict_global):
     zone_atterissage_debut = 2000
     zone_atterissage_fin = 3500
     zone_parfaite = 2750
+
+    # TODO : regarder cet ajout
+    # Marianne : version qui s'adapte à tous les terrains :
+    # zone_atterissage_debut, zone_atterissage_fin = att.zoneAtterissage(plateau)
+    # zone_parfaite = zone_atterissage_debut + zone_atterissage_fin / 2
+
+
     if 3500 > variables_fin['X'] > 2000:
         var_parfaite = np.where(coordonnee == zone_parfaite)
         distance_zone_aterissage = abs(var[0][0] - var_parfaite[0][0])
