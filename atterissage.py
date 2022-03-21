@@ -74,6 +74,7 @@ def check_contraintesV2(simulationEnCours: MarsLanderSim):
     coordonnee = np.array(coordonnee)
     var = np.where(coordonnee == int(simulationEnCours.x))
     if simulationEnCours.y < simulationEnCours.plateau[1][var[0][0]]:
+        print('crash en y :', simulationEnCours.y, "; limite : ", simulationEnCours.plateau[1][var[0][0]])
         return False
     elif simulationEnCours.hs < -500 or simulationEnCours.hs > 500:
         print('erreur hSpeed')
@@ -122,31 +123,84 @@ def simulation(dict_varaible, new_power, new_rotate):
     return dict_varaible
 
 
-def simulationV2(simulationEnCours: MarsLanderSim, new_power, new_rotate):
+def simulationCorrigee(dict, power, rotate):
+    x = dict['X']
+    y = dict['Y']
+    hs = dict['hSpeed']
+    vs = dict['vSpeed']
+    f = dict['fuel']
+    r = dict['rotate']
+    p = dict['power']
     g = -3.711
-    if abs(simulationEnCours.power - new_power) == 1 or simulationEnCours.power == new_power:
-        simulationEnCours.power = new_power
-    elif simulationEnCours.power < new_power:
+
+    if abs(p - power) == 1 or p == power:
+        new_power = power
+    elif p < power:
+        new_power = p + 1
+    else:
+        new_power = p - 1
+
+    if abs(r - rotate) < 15 or r == rotate:
+        new_r = rotate
+    else:
+        new_r = r + math.copysign(15, rotate)
+    new_r = math.copysign(90, new_r) if (abs(new_r) > 90) else new_r
+
+    new_vs = vs + g + new_power * math.cos(new_r * math.pi / 180)
+
+    new_hs = hs - new_power * math.sin(new_r * math.pi / 180)
+
+    new_x = x + (new_hs + hs) / 2
+    new_y = y + (new_vs + vs) / 2
+    new_fuel = f - new_power
+
+    dict['X'] = new_x
+    dict['Y'] = new_y
+    dict['hSpeed'] = new_hs
+    dict['vSpeed'] = new_vs
+    dict['fuel'] = new_fuel
+    dict['rotate'] = new_r
+    dict['power'] = new_power
+    dict['periode'] = dict['periode'] + 1
+    return dict
+
+
+def simulationV2(simulationEnCours: MarsLanderSim, power, rotate):
+    x = simulationEnCours.x
+    y = simulationEnCours.y
+    hs = simulationEnCours.hs
+    vs = simulationEnCours.vs
+    f = simulationEnCours.fuel
+    g = -3.711
+
+    if abs(simulationEnCours.power - power) == 1 or simulationEnCours.power == power:
+        simulationEnCours.power = power
+    elif simulationEnCours.power < power:
         simulationEnCours.power = simulationEnCours.power + 1
     else:
         simulationEnCours.power = simulationEnCours.power - 1
 
-    if abs(simulationEnCours.rotate - new_rotate) < 15 or simulationEnCours.rotate == new_rotate:
-        simulationEnCours.rotate = new_rotate
-    elif simulationEnCours.rotate < new_rotate:
-        simulationEnCours.rotate + math.copysign(15, new_rotate)
+    if abs(rotate) < 15 or simulationEnCours.rotate == rotate:
+        simulationEnCours.rotate = rotate
     else:
-        simulationEnCours.rotate - math.copysign(15, new_rotate)
+        simulationEnCours.rotate = simulationEnCours.rotate + math.copysign(15, rotate)
+    simulationEnCours.rotate = math.copysign(90, simulationEnCours.rotate) if (
+            abs(simulationEnCours.rotate) > 90) else simulationEnCours.rotate
 
-    simulationEnCours.vs = simulationEnCours.vs + (g + simulationEnCours.power) * math.sin(
-        simulationEnCours.rotate * math.pi / 180)
-    simulationEnCours.hs = simulationEnCours.hs + simulationEnCours.vs * math.cos(
-        simulationEnCours.rotate * math.pi / 180)
-    simulationEnCours.x = simulationEnCours.x + simulationEnCours.hs
-    simulationEnCours.y = simulationEnCours.y + simulationEnCours.vs
-    simulationEnCours.fuel = simulationEnCours.fuel - simulationEnCours.power
-    simulationEnCours.periode = simulationEnCours.periode + 1
+    new_vs = vs + g + simulationEnCours.power * math.cos(simulationEnCours.rotate * math.pi / 180)
 
+    new_hs = hs - simulationEnCours.power * math.sin(simulationEnCours.rotate * math.pi / 180)
+
+    new_x = x + (new_hs + hs) / 2
+    new_y = y + (new_vs + vs) / 2
+    new_fuel = f - simulationEnCours.power
+
+    simulationEnCours.x = new_x
+    simulationEnCours.y = new_y
+    simulationEnCours.hs = new_hs
+    simulationEnCours.vs = new_vs
+    simulationEnCours.fuel = new_fuel
+    simulationEnCours.periode += 1
     return simulationEnCours
 
 
@@ -161,8 +215,9 @@ def lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power, 
         dico_atterissage[loop + 1] = simulation(dico_atterissage[loop], new_power, new_rotate).copy()
         tracey.append(dico_atterissage[loop]['Y'])
         tracex.append(dico_atterissage[loop]['X'])
-        affichage(dico_atterissage, tracex, tracey)
+        # affichage(dico_atterissage, tracex, tracey)
         loop += 1
+    print(loop)
     return evaluation(dico_atterissage), dico_atterissage
 
 
@@ -185,8 +240,12 @@ def lancementV2(simulationEnCours: MarsLanderSim, save_try):
         new_rotate, new_power = newSimulationV2(save_try, loop, simulationEnCours)
         simulationEnCours.dico_atterissage[loop + 1] = simulationV2(simulationEnCours, new_power,
                                                                     new_rotate).sim_to_dict().copy()
+        print(simulationEnCours.x, simulationEnCours.y, simulationEnCours.hs, simulationEnCours.vs,
+              simulationEnCours.fuel, simulationEnCours.rotate,
+              simulationEnCours.power)
         tracey.append(simulationEnCours.y)
         tracex.append(simulationEnCours.x)
-        affichageV2(simulationEnCours.plateau, tracex, tracey)
+        # affichageV2(simulationEnCours.plateau, tracex, tracey)
         loop += 1
+    print(loop)
     return evaluationV2(simulationEnCours)
