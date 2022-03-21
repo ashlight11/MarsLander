@@ -28,6 +28,7 @@ def init(plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power):
 def check_contraintes(dict_varaible, plateau):
     crash = False
     loop = 0
+    print("check : ", dict_varaible)
     if dict_varaible['X'] <= 0 or dict_varaible['X'] > 7000:
         print('erreur X')
         return False
@@ -38,7 +39,7 @@ def check_contraintes(dict_varaible, plateau):
     coordonnee = np.array(coordonnee)
     var = np.where(coordonnee == int(dict_varaible['X']))
     if dict_varaible['Y'] < plateau[1][var[0][0]]:
-        print('crash')
+        print('crash en y :', dict_varaible['Y'], "; limite : ", plateau[1][var[0][0]])
         return False
     elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
         print('erreur hSpeed')
@@ -209,7 +210,6 @@ def lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power, 
     tracex = []
     tracey = []
     loop = 0
-
     while check_contraintes(dico_atterissage[loop], dico_atterissage['plateau']):
         new_rotate, new_power = newSimulation(save_try, random, nb_tours, loop, best_score)
         dico_atterissage[loop + 1] = simulation(dico_atterissage[loop], new_power, new_rotate).copy()
@@ -221,6 +221,23 @@ def lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power, 
     return evaluation(dico_atterissage), dico_atterissage
 
 
+def lancementV2(simulationEnCours: MarsLanderSim, save_try):
+    tracex = []
+    tracey = []
+    loop = 0
+    sim = simulationEnCours
+    while check_contraintes(sim.dico_atterissage[loop], sim.plateau):
+        new_rotate, new_power = newSimulationV2(save_try, loop, sim)
+        sim = simulationV2(sim, new_power, new_rotate)
+        sim.sim_to_dict(loop + 1)
+        #print(sim.x, sim.y, sim.hs, sim.vs, sim.fuel, sim.rotate, sim.power)
+        #print(sim.dico_atterissage[loop])
+        tracey.append(sim.y)
+        tracex.append(sim.x)
+        affichageV2(sim.plateau, tracex, tracey)
+        loop += 1
+    return evaluationV2(sim), sim
+
 def zoneAtterissage(plateau):
     begin_flat = 0
     end_flat = 0
@@ -230,22 +247,3 @@ def zoneAtterissage(plateau):
             end_flat = plateau[index + 1]
 
     return begin_flat, end_flat
-
-
-def lancementV2(simulationEnCours: MarsLanderSim, save_try):
-    tracex = []
-    tracey = []
-    loop = 0
-    while check_contraintesV2(simulationEnCours):
-        new_rotate, new_power = newSimulationV2(save_try, loop, simulationEnCours)
-        simulationEnCours.dico_atterissage[loop + 1] = simulationV2(simulationEnCours, new_power,
-                                                                    new_rotate).sim_to_dict().copy()
-        print(simulationEnCours.x, simulationEnCours.y, simulationEnCours.hs, simulationEnCours.vs,
-              simulationEnCours.fuel, simulationEnCours.rotate,
-              simulationEnCours.power)
-        tracey.append(simulationEnCours.y)
-        tracex.append(simulationEnCours.x)
-        # affichageV2(simulationEnCours.plateau, tracex, tracey)
-        loop += 1
-    print(loop)
-    return evaluationV2(simulationEnCours)

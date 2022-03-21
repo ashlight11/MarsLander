@@ -4,28 +4,37 @@ import atterissage as att
 
 
 class MarsLanderSim:
-    def __init__(self, plateau, init_data, nb_essais=10, nb_atterissages=5, taux=0.5):
+    def __init__(self, plateau, init_data, nb_essais=2, nb_atterissages=5, taux=0.5):
+
         self.plateau = construction_plateau_bis(plateau)
-        self.nb_essais = nb_essais
-        self.nb_atterissages = nb_atterissages
-        self.taux_tour = taux
         self.best_try = {}
         self.best_score = 10000
         self.periode = 0
-        self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power = [int(i) for i in init_data.split()]
-        print(self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power)
-        self.dico_atterissage = self.sim_to_dict()
-        print(self.dico_atterissage)
+        self.dico_atterissage = None
+        self.power = None
+        self.rotate = None
+        self.fuel = None
+        self.vs = None
+        self.hs = None
+        self.y = None
+        self.x = None
+        self.nb_atterissages = nb_atterissages
+        self.nb_essais = nb_essais
+        self.taux_tour = taux
+
+        self.perform_init(init_data)
 
         for i in range(self.nb_essais):
             save_try = self.best_try
+
             if i == 0:
                 self.random = True
             else:
                 self.random = False
             for j in range(self.nb_atterissages):
-                score_obtenu = att.lancementV2(simulationEnCours=self, save_try=save_try)
-                save_try[score_obtenu] = self.sim_to_dict()
+                score_obtenu, self = att.lancementV2(simulationEnCours=self, save_try=save_try)
+                save_try[score_obtenu] = self.dico_atterissage
+                self.perform_init(init_data)
             new_dic = sorted(save_try.items(), key=lambda t: t[0])
             for key, value in new_dic:
                 self.best_try[key] = value
@@ -33,12 +42,18 @@ class MarsLanderSim:
                 break
             plt.close('all')
 
-    def sim_to_dict(self):
-        dict_global = {}
+    def perform_init(self, init_data):
+        self.periode = 0
+        self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power = [int(i) for i in init_data.split()]
+        # print(self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power)
+        self.dico_atterissage = {}
+        self.sim_to_dict(0)
+
+    def sim_to_dict(self, loop):
+
         dict_variable = {'periode': self.periode, 'X': self.x, 'Y': self.y, 'hSpeed': self.hs, 'vSpeed': self.vs,
                          'fuel': self.fuel, 'rotate': self.rotate, 'power': self.power}
-        dict_global[0] = dict_variable
-        return dict_global
+        self.dico_atterissage[loop] = dict_variable
 
 
 # Press the green button in the gutter to run the script.
