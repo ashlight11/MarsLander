@@ -9,6 +9,8 @@ def main():
     for i in range(nb_try):
         save_try = save_best_try
         plateau_def = [0, 1000, 2000, 3500, 5000, 6999, 1500, 2000, 500, 500, 1500, 1000]
+        # en utilisant le format correct
+        # plateau_def = [(0, 1500), (1000, 2000), (2000, 500), (3500, 500), (5000, 1500), (6999, 1000)]
         nb_aterissage = 5
         X = 5000
         Y = 2500

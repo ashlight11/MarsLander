@@ -87,7 +87,7 @@ def affichageV2(plateau, tracex, tracey):
     plt.ylim(0, 3000)
     plt.plot(plateau[0], plateau[1], color="blue")
     # plt.plot(X, Y, marker="o", color="red")
-    print(tracex, tracey)
+    #print(tracex, tracey)
     plt.plot(tracex, tracey, color="red")
     plt.ion()
     plt.draw()

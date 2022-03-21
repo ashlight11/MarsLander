@@ -72,10 +72,8 @@ def check_contraintesV2(simulationEnCours: MarsLanderSim):
         return False
     coordonnee = simulationEnCours.plateau[0]
     coordonnee = np.array(coordonnee)
-
     var = np.where(coordonnee == int(simulationEnCours.x))
     if simulationEnCours.y < simulationEnCours.plateau[1][var[0][0]]:
-        print('crash')
         return False
     elif simulationEnCours.hs < -500 or simulationEnCours.hs > 500:
         print('erreur hSpeed')
@@ -167,6 +165,7 @@ def lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power, 
         loop += 1
     return evaluation(dico_atterissage), dico_atterissage
 
+
 def zoneAtterissage(plateau):
     begin_flat = 0
     end_flat = 0
@@ -183,10 +182,11 @@ def lancementV2(simulationEnCours: MarsLanderSim, save_try):
     tracey = []
     loop = 0
     while check_contraintesV2(simulationEnCours):
+        new_rotate, new_power = newSimulationV2(save_try, loop, simulationEnCours)
+        simulationEnCours.dico_atterissage[loop + 1] = simulationV2(simulationEnCours, new_power,
+                                                                    new_rotate).sim_to_dict().copy()
         tracey.append(simulationEnCours.y)
         tracex.append(simulationEnCours.x)
         affichageV2(simulationEnCours.plateau, tracex, tracey)
-        new_rotate, new_power = newSimulationV2(save_try, loop, simulationEnCours)
-        simulationV2(simulationEnCours, new_power, new_rotate)
         loop += 1
     return evaluationV2(simulationEnCours)

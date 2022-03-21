@@ -14,6 +14,8 @@ class MarsLanderSim:
         self.periode = 0
         self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power = [int(i) for i in init_data.split()]
         print(self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power)
+        self.dico_atterissage = self.sim_to_dict()
+        print(self.dico_atterissage)
 
         for i in range(self.nb_essais):
             save_try = self.best_try
