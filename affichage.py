@@ -1,33 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def construction_plateau_bis(data):
-    plateau = []
-    taille = len(data)
-    X = data[0][0]
-    Y = data[0][1]
-    coordx = []
-    coordy = []
-    coordx.append(X)
-    coordy.append(Y)
-    plateau.append(coordx)
-    plateau.append(coordy)
-    landynext = Y
-    landxnext = X
-    loop = 0
-    while loop < taille - 1:
-        stepy = (data[1 + loop][1] - data[loop][1]) / abs(
-            (data[loop + 1][0] - data[loop][0]))
-        stepx = (data[loop + 1][0] - data[loop][0]) / abs(data[loop + 1][0] - data[loop][0])
-        for i in range(0, abs(data[loop + 1][0] - data[loop][0])):
-            landxnext = landxnext + stepx
-            landynext = stepy + landynext
-            plateau[0].append(landxnext)
-            plateau[1].append(landynext)
-        loop += 1
-    plt.show()
 
-    return plateau
 
 
 def affichageV2(plateau, tracex, tracey, succes, best_score):

@@ -1,11 +1,13 @@
-from matplotlib import pyplot as plt
-from affichage import construction_plateau_bis,affichageV2
-import atterissage as att
 import time
+
+from matplotlib import pyplot as plt
+
+import atterissage as att
+from affichage import construction_plateau_bis
 
 
 class MarsLanderSim:
-    def __init__(self, plateau, init_data, nb_essais=1000, nb_atterissages=50, taux=0.5):
+    def __init__(self, plateau, init_data, nb_essais=1, nb_atterissages=50, taux=0.5):
 
         self.plateau = construction_plateau_bis(plateau)
         self.best_try = {}
@@ -35,7 +37,7 @@ class MarsLanderSim:
             else:
                 self.random = False
             for j in range(self.nb_atterissages):
-                score_obtenu, self,succes = att.lancementV2(simulationEnCours=self, save_try=save_try)
+                score_obtenu, self, succes = att.lancementV2(simulationEnCours=self, save_try=save_try)
                 save_try[score_obtenu] = self.dico_atterissage
                 self.perform_init(init_data)
             new_dic = sorted(save_try.items(), key=lambda t: t[0])
@@ -49,12 +51,13 @@ class MarsLanderSim:
             print("rotate = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['rotate'])
             print("X = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['X'])
             print("nb_tours = ", i)
-            test  = self.tracex
-            #affichageV2(plateau,self.tracex,self.tracey)
+            test = self.tracex
+            # affichageV2(plateau,self.tracex,self.tracey)
             if succes:
                 plt.pause(20)
                 break
-            else:plt.close('all')
+            else:
+                plt.close('all')
 
     def perform_init(self, init_data):
         self.periode = 0
@@ -66,7 +69,8 @@ class MarsLanderSim:
     def sim_to_dict(self, loop):
 
         dict_variable = {'periode': self.periode, 'X': self.x, 'Y': self.y, 'hSpeed': self.hs, 'vSpeed': self.vs,
-                         'fuel': self.fuel, 'rotate': self.rotate, 'power': self.power,'tracex': self.tracex,'tracey': self.tracey}
+                         'fuel': self.fuel, 'rotate': self.rotate, 'power': self.power, 'tracex': self.tracex,
+                         'tracey': self.tracey}
         self.dico_atterissage[loop] = dict_variable
 
 
