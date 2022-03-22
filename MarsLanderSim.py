@@ -1,11 +1,11 @@
 from matplotlib import pyplot as plt
-from affichage import construction_plateau_bis
+from affichage import construction_plateau_bis,affichageV2
 import atterissage as att
 import time
 
 
 class MarsLanderSim:
-    def __init__(self, plateau, init_data, nb_essais=10, nb_atterissages=5, taux=0.5):
+    def __init__(self, plateau, init_data, nb_essais=1000, nb_atterissages=50, taux=0.5):
 
         self.plateau = construction_plateau_bis(plateau)
         self.best_try = {}
@@ -19,6 +19,8 @@ class MarsLanderSim:
         self.hs = None
         self.y = None
         self.x = None
+        self.tracex = []
+        self.tracey = []
         self.nb_atterissages = nb_atterissages
         self.nb_essais = nb_essais
         self.taux_tour = taux
@@ -33,7 +35,7 @@ class MarsLanderSim:
             else:
                 self.random = False
             for j in range(self.nb_atterissages):
-                score_obtenu, self = att.lancementV2(simulationEnCours=self, save_try=save_try)
+                score_obtenu, self,succes = att.lancementV2(simulationEnCours=self, save_try=save_try)
                 save_try[score_obtenu] = self.dico_atterissage
                 self.perform_init(init_data)
             new_dic = sorted(save_try.items(), key=lambda t: t[0])
@@ -42,7 +44,17 @@ class MarsLanderSim:
                 self.best_score = key
                 break
             print("best : ", self.best_score)
-            plt.close('all')
+            print("vspeed = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['vSpeed'])
+            print("hspeed = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['hSpeed'])
+            print("rotate = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['rotate'])
+            print("X = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['X'])
+            print("nb_tours = ", i)
+            test  = self.tracex
+            #affichageV2(plateau,self.tracex,self.tracey)
+            if succes:
+                plt.pause(20)
+                break
+            else:plt.close('all')
 
     def perform_init(self, init_data):
         self.periode = 0
@@ -54,7 +66,7 @@ class MarsLanderSim:
     def sim_to_dict(self, loop):
 
         dict_variable = {'periode': self.periode, 'X': self.x, 'Y': self.y, 'hSpeed': self.hs, 'vSpeed': self.vs,
-                         'fuel': self.fuel, 'rotate': self.rotate, 'power': self.power}
+                         'fuel': self.fuel, 'rotate': self.rotate, 'power': self.power,'tracex': self.tracex,'tracey': self.tracey}
         self.dico_atterissage[loop] = dict_variable
 
 
@@ -72,5 +84,5 @@ if __name__ == '__main__':
                      (2900, 300), (3000, 200), (3200, 1000), (3500, 500), (3800, 800), (4000, 200), (4200, 800),
                      (4800, 600), (5000, 1200), (5500, 900), (6000, 500), (6500, 300), (6999, 500)]
     start_time = time.time()
-    simulation = MarsLanderSim(ground, input_first)
+    simulation = MarsLanderSim(ground_level3, input_first)
     print("--- %s seconds ---" % (time.time() - start_time))

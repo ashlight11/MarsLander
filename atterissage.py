@@ -5,6 +5,7 @@ import MarsLanderSim
 from AlgoGene import newSimulation, evaluation, newSimulationV2, evaluationV2
 from affichage import construction_plateau, affichage, affichageV2, construction_plateau_bis
 
+succes = False
 
 def init(plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power):
     dict_global = {}
@@ -35,9 +36,18 @@ def check_contraintes(dict_varaible, plateau):
         return False
     coordonnee = plateau[0]
     coordonnee = np.array(coordonnee)
+
+    atterissage_debut,atterissage_fin = zoneAtterissagebis(plateau)
+
     var = np.where(coordonnee == int(dict_varaible['X']))
     if dict_varaible['Y'] < plateau[1][var[0][0]]:
-        print('crash')
+        if abs(dict_varaible['vSpeed'])<= 40 and dict_varaible['rotate'] == 0 and abs(dict_varaible['hSpeed'])<= 20 and dict_varaible['X']<atterissage_fin and  dict_varaible['X']>atterissage_debut:
+            print('Réussite')
+            global succes
+            succes = True
+        else:
+          #  print('crash')
+            v =1
         return False
     elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
         print('erreur hSpeed')
@@ -202,6 +212,9 @@ def simulationV2(simulationEnCours: MarsLanderSim, power, rotate):
     simulationEnCours.vs = new_vs
     simulationEnCours.fuel = new_fuel
     simulationEnCours.periode += 1
+
+    simulationEnCours.tracex.append(simulationEnCours.x)
+    simulationEnCours.tracey.append(simulationEnCours.y)
     return simulationEnCours
 
 
@@ -212,10 +225,10 @@ def lancement(save_try, plateau_def, X, Y, hSpeed, vSpeed, fuel, rotate, power, 
     loop = 0
     while check_contraintes(dico_atterissage[loop], dico_atterissage['plateau']):
         new_rotate, new_power = newSimulation(save_try, random, nb_tours, loop, best_score)
-        dico_atterissage[loop + 1] = simulation(dico_atterissage[loop], new_power, new_rotate).copy()
+        dico_atterissage[loop + 1] = simulationCorrigee(dico_atterissage[loop], new_power, new_rotate).copy()
         tracey.append(dico_atterissage[loop]['Y'])
         tracex.append(dico_atterissage[loop]['X'])
-        # affichage(dico_atterissage, tracex, tracey)
+        #affichage(dico_atterissage, tracex, tracey)
         loop += 1
     return evaluation(dico_atterissage), dico_atterissage
 
@@ -233,9 +246,16 @@ def lancementV2(simulationEnCours: MarsLanderSim, save_try):
         # print(sim.dico_atterissage[loop])
         tracey.append(sim.y)
         tracex.append(sim.x)
-        affichageV2(sim.plateau, tracex, tracey)
+        if succes is True:
+            break
+        #affichageV2(sim.plateau, tracex, tracey)
         loop += 1
-    return evaluationV2(sim), sim
+    if save_try:
+        for key in save_try:
+            best_score = key
+        affichageV2(sim.plateau, tracex, tracey,succes,best_score)
+    else: affichageV2(sim.plateau, tracex, tracey,succes,'xxxx')
+    return evaluationV2(sim), sim,succes
 
 
 def zoneAtterissage(plateau):
@@ -245,5 +265,18 @@ def zoneAtterissage(plateau):
         if index != len(plateau) - 1 and element[1] == plateau[index + 1][1]:
             begin_flat = element
             end_flat = plateau[index + 1]
+
+    return begin_flat, end_flat
+
+def zoneAtterissagebis(plateau):
+    begin_flat = 0
+    end_flat = 0
+    for i in range(len(plateau[1]) - 1):
+        if plateau[1][i] == plateau[1][i+1]:
+            begin_flat = plateau[0][i]
+            while plateau[1][i] == plateau[1][i+1]:
+                i +=1
+            end_flat = plateau[0][i]
+            return begin_flat, end_flat
 
     return begin_flat, end_flat
