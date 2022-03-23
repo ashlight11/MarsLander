@@ -9,7 +9,7 @@ import numpy as np
 # Use less Fossil Fuel.
 
 class MarsSim:
-    def __init__(self, init_data, nb_essais=1, nb_atterissages=1, taux=0.5):
+    def __init__(self, init_data, nb_essais=100, nb_atterissages=100, taux=0.5):
 
         self.best_try = {}
         self.best_score = 10000
@@ -27,21 +27,24 @@ class MarsSim:
         self.taux_tour = taux
 
         self.perform_init(init_data)
-
-        for i in range(self.nb_essais):
+        start_time = time.time()
+        j = 0
+        while time.time() - start_time < 0.1:
             save_try = self.best_try
-
+            i = 0
+            j += 1
             if i == 0:
                 self.random = True
             else:
                 self.random = False
 
-            while time.time() - start_time < 0.09:
-                score_obtenu, self, succes = lancementV2(simulationEnCours=self, save_try=save_try)
-                save_try[score_obtenu] = self.dico_atterissage
-                self.perform_init(init_data)
-            new_dic = sorted(save_try.items(), key=lambda t: t[0])
-            print(int(new_dic[0][1][1]['rotate']), int(new_dic[0][1][1]['power']))
+            score_obtenu, self, succes = lancementV2(simulationEnCours=self, save_try=save_try)
+            save_try[score_obtenu] = self.dico_atterissage
+            self.perform_init(init_data)
+            i += 1
+        new_dic = sorted(save_try.items(), key=lambda t: t[0])
+        print(int(new_dic[0][1][1]['rotate']), int(new_dic[0][1][1]['power']))
+        print('nb tours ' + str(j), file=sys.stderr, flush=True)
 
     def perform_init(self, init_data):
         self.periode = 0
@@ -87,7 +90,7 @@ def construction_plateau_bis(data):
 def lancementV2(simulationEnCours: MarsSim, save_try):
     loop = 0
     sim = simulationEnCours
-    while check_contraintes(sim.dico_atterissage[loop]):
+    while check_contraintes(sim.dico_atterissage[loop]) and loop < 3:
         new_rotate, new_power = newSimulationV2(save_try, loop, sim)
         sim = simulationV2(sim, new_power, new_rotate)
         sim.sim_to_dict(loop + 1)
@@ -120,23 +123,26 @@ def evaluationV2(simulationEnCours: MarsSim):
         # var_parfaite = np.where(coordonnee == zone_parfaite)
         # distance_zone_aterissage = abs(var[0][0] - var_parfaite[0][0])
         distance_zone_aterissage = 0
+        print('Bon endroit', file=sys.stderr, flush=True)
+
     else:
         var_debut = np.where(coordonnee == zone_parfaite)
         distance_zone_aterrisage_debut = abs(var[0][0] - var_debut[0][0])
         var_fin = np.where(coordonnee == zone_parfaite)
         distance_zone_aterrisage_fin = abs(var[0][0] - var_fin[0][0])
         distance_zone_aterissage = (min([distance_zone_aterrisage_debut, distance_zone_aterrisage_fin])) * 10
+        print('distance zone ' + str(distance_zone_aterissage), file=sys.stderr, flush=True)
 
-    if abs(simulationEnCours.vs) > 40:
-        distance_vspeed = (abs(simulationEnCours.vs) - 40) * 2
+    if abs(simulationEnCours.vs) > 35:
+        distance_vspeed = (abs(simulationEnCours.vs) - 35) * 200
     else:
         distance_vspeed = 0
-    if abs(simulationEnCours.hs) > 20:
-        distance_hspeed = (abs(simulationEnCours.hs) - 20) * 2
+    if abs(simulationEnCours.hs) > 18:
+        distance_hspeed = (abs(simulationEnCours.hs) - 18) * 100
     else:
         distance_hspeed = 0
     if simulationEnCours.rotate != 0:
-        distance_rotate = (abs(simulationEnCours.rotate)) * 2
+        distance_rotate = (abs(simulationEnCours.rotate)) * 5
     else:
         distance_rotate = 0
     distance_fin = distance_rotate + distance_hspeed + distance_vspeed
@@ -199,8 +205,8 @@ def simulationV2(simulationEnCours: MarsSim, power, rotate):
         simulationEnCours.rotate = rotate
     else:
         simulationEnCours.rotate = simulationEnCours.rotate + math.copysign(15, rotate)
-    simulationEnCours.rotate = math.copysign(90, simulationEnCours.rotate) if (
-            abs(simulationEnCours.rotate) > 90) else simulationEnCours.rotate
+    simulationEnCours.rotate = math.copysign(60, simulationEnCours.rotate) if (
+            abs(simulationEnCours.rotate) > 60) else simulationEnCours.rotate
 
     new_vs = vs + g + simulationEnCours.power * math.cos(simulationEnCours.rotate * math.pi / 180)
 
@@ -222,7 +228,7 @@ def simulationV2(simulationEnCours: MarsSim, power, rotate):
 
 def newSimulationV2(save_try, periode, simulation_en_cours: MarsSim):
     if simulation_en_cours.random:
-        new_rotate = random.randrange(-90, 90, 5)
+        new_rotate = random.randrange(-60, 60, 5)
         new_power = random.randint(3, 4)
     else:
         if periode in save_try[simulation_en_cours.best_score]:
@@ -276,6 +282,7 @@ while True:
     # p: the thrust power (0 to 4).
 
     simulation = MarsSim(input())
+    start_time = time.time()
 
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
