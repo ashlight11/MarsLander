@@ -12,7 +12,7 @@ class MarsSim:
     def __init__(self, init_data, nb_essais=100, nb_atterissages=100, taux=0.5):
 
         self.best_try = {}
-        self.best_score = 10000
+        self.best_score = 10000000
         self.periode = 0
         self.dico_atterissage = None
         self.power = None
@@ -25,23 +25,18 @@ class MarsSim:
         self.nb_atterissages = nb_atterissages
         self.nb_essais = nb_essais
         self.taux_tour = taux
+        self.random = True
 
         self.perform_init(init_data)
         start_time = time.time()
         j = 0
         while time.time() - start_time < 0.1:
             save_try = self.best_try
-            i = 0
-            j += 1
-            if i == 0:
-                self.random = True
-            else:
-                self.random = False
+            j+=1
 
             score_obtenu, self, succes = lancementV2(simulationEnCours=self, save_try=save_try)
             save_try[score_obtenu] = self.dico_atterissage
             self.perform_init(init_data)
-            i += 1
         new_dic = sorted(save_try.items(), key=lambda t: t[0])
 
         coordonnee = plateau[0]
@@ -99,10 +94,14 @@ def construction_plateau_bis(data):
 def lancementV2(simulationEnCours: MarsSim, save_try):
     loop = 0
     sim = simulationEnCours
-    while check_contraintes(sim.dico_atterissage[loop]) and loop < 5:
+    while check_contraintes(sim.dico_atterissage[loop]) and loop < 2:
         new_rotate, new_power = newSimulationV2(save_try, loop, sim)
         sim = simulationV2(sim, new_power, new_rotate)
         sim.sim_to_dict(loop + 1)
+        """
+        if loop > 2:
+            sim.random = False
+        """
         if succes is True:
             break
         loop += 1
@@ -113,8 +112,6 @@ def evaluationV2(simulationEnCours: MarsSim):
     # variables_fin = dict_global[len(dict_global) - 2]
     global plateau
 
-    coordonnee = plateau[0]
-    coordonnee = np.array(coordonnee)
     var = plateau[0].index(int(simulationEnCours.x))
     # rajouter ca pour le 5 ?? plateau[1][var[0][0]] mais apres bug sur les sorties de plateau
 
@@ -128,22 +125,22 @@ def evaluationV2(simulationEnCours: MarsSim):
     # créer une fonction pour trouver le début et la fin de la zone d'aterissage par rapport au tableau plateau
     zone_atterissage_debut, zone_atterissage_fin = zoneAtterissagebis()
     zone_parfaite = zone_atterissage_debut + zone_atterissage_fin / 2
-    if zone_atterissage_fin > simulationEnCours.x > zone_atterissage_debut:
+    if (zone_atterissage_fin+50) > simulationEnCours.x > (zone_atterissage_debut-50):
         # var_parfaite = np.where(coordonnee == zone_parfaite)
         # distance_zone_aterissage = abs(var[0][0] - var_parfaite[0][0])
         distance_zone_aterissage = 0
         #print('Bon endroit', file=sys.stderr, flush=True)
 
     else:
-        var_debut = np.where(coordonnee == zone_parfaite)
-        distance_zone_aterrisage_debut = abs(var - var_debut[0][0])
-        var_fin = np.where(coordonnee == zone_parfaite)
-        distance_zone_aterrisage_fin = abs(var - var_fin[0][0])
-        distance_zone_aterissage = min([distance_zone_aterrisage_debut, distance_zone_aterrisage_fin]) * 100
+        var_debut = plateau[0].index(int(zone_parfaite))
+        distance_zone_aterrisage_debut = abs(var - var_debut)
+        var_fin = var_debut
+        distance_zone_aterrisage_fin = abs(var - var_fin)
+        distance_zone_aterissage = min([distance_zone_aterrisage_debut, distance_zone_aterrisage_fin]) * 200
         #print('distance zone ' + str(distance_zone_aterissage), file=sys.stderr, flush=True)
 
-    if abs(simulationEnCours.vs) >= 35:
-        distance_vspeed = (abs(simulationEnCours.vs) - 35) * 3000
+    if abs(simulationEnCours.vs) >= 20:
+        distance_vspeed = (abs(simulationEnCours.vs) - 20) * 3000
     else:
         distance_vspeed = 0
     if abs(simulationEnCours.hs) >= 18:
@@ -229,6 +226,7 @@ def newSimulationV2(save_try, periode, simulation_en_cours: MarsSim):
         new_rotate = random.randrange(-90, 90, 5)
         new_power = random.randint(3, 4)
     else:
+        print('pas random total' , file=sys.stderr, flush=True)
         if periode in save_try[simulation_en_cours.best_score]:
             alea = random.randint(0, 9)
             if simulation_en_cours.taux_tour * 10 > alea:
