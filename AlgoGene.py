@@ -9,18 +9,16 @@ from MarsLanderSim import MarsLanderSim
 def evaluationV2(simulationEnCours: MarsLanderSim):
     # variables_fin = dict_global[len(dict_global) - 2]
     plateau = simulationEnCours.plateau
-
-    coordonnee = plateau[0]
-    coordonnee = np.array(coordonnee)
-    var = np.where(coordonnee == int(simulationEnCours.x))
     # rajouter ca pour le 5 ?? plateau[1][var[0][0]] mais apres bug sur les sorties de plateau
 
     if simulationEnCours.x <= 0 or simulationEnCours.x >= 6999 or simulationEnCours.y <= 0 or simulationEnCours.y >= 2999:
         return 100000
-    if simulationEnCours.y < plateau[1][var[0][0]]:
+
+    var = plateau[0].index(int(simulationEnCours.x))
+    if simulationEnCours.y < plateau[1][var]:
         distance_altitude_point = 0
     else:
-        distance_altitude_point = abs(plateau[1][var[0][0]] - simulationEnCours.y)
+        distance_altitude_point = abs(plateau[1][var] - simulationEnCours.y)
 
     # créer une fonction pour trouver le début et la fin de la zone d'aterissage par rapport au tableau plateau
     zone_atterissage_debut, zone_atterissage_fin = att.zoneAtterissagebis(simulationEnCours.plateau)
@@ -30,11 +28,13 @@ def evaluationV2(simulationEnCours: MarsLanderSim):
         # distance_zone_aterissage = abs(var[0][0] - var_parfaite[0][0])
         distance_zone_aterissage = 0
     else:
-        var_debut = np.where(coordonnee == zone_parfaite)
-        distance_zone_aterrisage_debut = abs(var[0][0] - var_debut[0][0])
-        var_fin = np.where(coordonnee == zone_parfaite)
-        distance_zone_aterrisage_fin = abs(var[0][0] - var_fin[0][0])
+        var_debut = plateau[0].index(int(zone_parfaite))
+        distance_zone_aterrisage_debut = abs(var - var_debut)
+        var_fin = var_debut
+        distance_zone_aterrisage_fin = abs(var - var_fin)
         distance_zone_aterissage = (min([distance_zone_aterrisage_debut, distance_zone_aterrisage_fin])) * 10
+
+
 
     if abs(simulationEnCours.vs) > 40:
         distance_vspeed = (abs(simulationEnCours.vs) - 40) * 2

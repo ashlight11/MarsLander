@@ -7,7 +7,7 @@ from affichage import construction_plateau_bis
 
 
 class MarsLanderSim:
-    def __init__(self, plateau, init_data, nb_essais=1, nb_atterissages=50, taux=0.5):
+    def __init__(self, plateau, init_data, nb_essais=1000, nb_atterissages=20, taux=0.5):
 
         self.plateau = construction_plateau_bis(plateau)
         self.best_try = {}
@@ -76,7 +76,7 @@ class MarsLanderSim:
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    input_first = "5000 2500 -50 0 1000 90 0"  # (X Y hSpeed vSpeed fuel rotate power)
+    input_first = "5000 2500 -50 0 1000 0 0"  # (X Y hSpeed vSpeed fuel rotate power)
     ground = [(0, 1500), (1000, 2000), (2000, 500), (3500, 500), (5000, 1500), (6999, 1000)]
     ground_level2 = [(0, 100), (1000, 500), (1500, 100), (3000, 100), (3500, 500), (3700, 200), (5000, 1500),
                      (5800, 300), (6000, 1000), (6999, 2000)]
@@ -87,6 +87,9 @@ if __name__ == '__main__':
     ground_level5 = [(0, 1000), (300, 1500), (350, 1400), (500, 2100), (1500, 2100), (2000, 200), (2500, 500),
                      (2900, 300), (3000, 200), (3200, 1000), (3500, 500), (3800, 800), (4000, 200), (4200, 800),
                      (4800, 600), (5000, 1200), (5500, 900), (6000, 500), (6500, 300), (6999, 500)]
+
+    ground_level_grotte = [(0, 200), (1500, 500), (3000, 200), (5500, 200), (4500, 1000), (2500, 1500), (3500, 1500),
+                            (6999, 1600)]
     start_time = time.time()
-    simulation = MarsLanderSim(ground_level3, input_first)
+    simulation = MarsLanderSim(ground, input_first)
     print("--- %s seconds ---" % (time.time() - start_time))

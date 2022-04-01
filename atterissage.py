@@ -23,34 +23,65 @@ def check_contraintes(dict_varaible, plateau):
     atterissage_debut, atterissage_fin = zoneAtterissagebis(plateau)
 
     var = np.where(coordonnee == int(dict_varaible['X']))
-    if dict_varaible['Y'] < plateau[1][var[0][0]]:
-        if abs(dict_varaible['vSpeed']) <= 40 and dict_varaible['rotate'] == 0 and abs(
-                dict_varaible['hSpeed']) <= 20 and atterissage_fin > dict_varaible['X'] > atterissage_debut:
-            print('Réussite')
-            global succes
-            succes = True
+    if len(var[0]) == 3:
+        if (dict_varaible['Y'] < plateau[1][var[0][0]] and dict_varaible['Y'] > plateau[1][var[0][1]]):
+            if abs(dict_varaible['vSpeed']) <= 40 and dict_varaible['rotate'] == 0 and abs(
+                    dict_varaible['hSpeed']) <= 20 and atterissage_fin > dict_varaible['X'] > atterissage_debut:
+                print('Réussite')
+                global succes
+                succes = True
+            else:
+                #  print('crash')
+                v = 1
+            return False
+        elif (dict_varaible['Y'] > plateau[1][var[0][1]] and dict_varaible['Y'] < plateau[1][var[0][2]]):
+            return False
+        elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
+            print('erreur hSpeed')
+            return False
+        elif dict_varaible['vSpeed'] < -500 or dict_varaible['vSpeed'] > 500:
+            print('erreur vSpeed')
+            return False
+        elif dict_varaible['fuel'] < 0 or dict_varaible['fuel'] > 2000:
+            print('erreur fuel')
+            return False
+        elif dict_varaible['rotate'] < -90 or dict_varaible['rotate'] > 90:
+            print('erreur rotate')
+            return False
+        elif dict_varaible['power'] < 0 or dict_varaible['power'] > 4:
+            # or dict_varaible['surfaceN'] < 2 or dict_varaible['surfaceN'] > 30
+            print('erreur power')
+            return False
         else:
-            #  print('crash')
-            v = 1
-        return False
-    elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
-        print('erreur hSpeed')
-        return False
-    elif dict_varaible['vSpeed'] < -500 or dict_varaible['vSpeed'] > 500:
-        print('erreur vSpeed')
-        return False
-    elif dict_varaible['fuel'] < 0 or dict_varaible['fuel'] > 2000:
-        print('erreur fuel')
-        return False
-    elif dict_varaible['rotate'] < -90 or dict_varaible['rotate'] > 90:
-        print('erreur rotate')
-        return False
-    elif dict_varaible['power'] < 0 or dict_varaible['power'] > 4:
-        # or dict_varaible['surfaceN'] < 2 or dict_varaible['surfaceN'] > 30
-        print('erreur power')
-        return False
+            return True
     else:
-        return True
+        if dict_varaible['Y'] < plateau[1][var[0][0]]:
+            if abs(dict_varaible['vSpeed']) <= 40 and dict_varaible['rotate'] == 0 and abs(
+                    dict_varaible['hSpeed']) <= 20 and atterissage_fin > dict_varaible['X'] > atterissage_debut:
+                print('Réussite')
+                succes = True
+            else:
+                #  print('crash')
+                v = 1
+            return False
+        elif dict_varaible['hSpeed'] < -500 or dict_varaible['hSpeed'] > 500:
+            print('erreur hSpeed')
+            return False
+        elif dict_varaible['vSpeed'] < -500 or dict_varaible['vSpeed'] > 500:
+            print('erreur vSpeed')
+            return False
+        elif dict_varaible['fuel'] < 0 or dict_varaible['fuel'] > 2000:
+            print('erreur fuel')
+            return False
+        elif dict_varaible['rotate'] < -90 or dict_varaible['rotate'] > 90:
+            print('erreur rotate')
+            return False
+        elif dict_varaible['power'] < 0 or dict_varaible['power'] > 4:
+            # or dict_varaible['surfaceN'] < 2 or dict_varaible['surfaceN'] > 30
+            print('erreur power')
+            return False
+        else:
+            return True
         # rajouter vérif de si on se pose de l'angle et la vitesse
 
 
