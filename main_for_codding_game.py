@@ -2,11 +2,6 @@ import sys
 import math
 import time
 import random
-import numpy as np
-
-
-# Save the Planet.
-# Use less Fossil Fuel.
 
 class MarsSim:
     def __init__(self, init_data, nb_essais=100, nb_atterissages=100, taux=0.5):
@@ -14,14 +9,14 @@ class MarsSim:
         self.best_try = {}
         self.best_score = 10000000
         self.periode = 0
-        self.dico_atterissage = 0
-        self.power = 0
-        self.rotate = 0
-        self.fuel = 0
-        self.vs = 0
-        self.hs = 0
-        self.y = 0
-        self.x = 0
+        self.dico_atterissage = None
+        self.power = None
+        self.rotate = None
+        self.fuel = None
+        self.vs = None
+        self.hs = None
+        self.y = None
+        self.x = None
         self.nb_atterissages = nb_atterissages
         self.nb_essais = nb_essais
         self.taux_tour = taux
@@ -30,23 +25,22 @@ class MarsSim:
         self.perform_init(init_data)
         start_time = time.time()
         j = 0
+        # vérification de la fenetre de temps
         while time.time() - start_time < 0.1:
             save_try = self.best_try
-            j+=1
-
+            j += 1
+            # lancement de la simulation, retourne un dictionnaire avec les essais réalisés
             score_obtenu, self, succes = lancementV2(simulationEnCours=self, save_try=save_try)
             save_try[score_obtenu] = self.dico_atterissage
             self.perform_init(init_data)
         new_dic = sorted(save_try.items(), key=lambda t: t[0])
-
-        coordonnee = plateau[0]
-        coordonnee = np.array(coordonnee)
-
-        atterissage_debut, atterissage_fin = zoneAtterissagebis()
+        # on conserve le meilleur essai pour la suite
         var = plateau[0].index(int(new_dic[0][1][1]['X']))
         if new_dic[0][1][1]['Y'] < plateau[1][var]:
+            # si on atteri on met automatiquement la fusée à un angle de 0 (possible seulement si elle à un angle compris en -15 et 15)
             print(0, int(new_dic[0][1][1]['power']))
         else:
+            # on envoi le résultat du meilleur essai réalisé
             print(int(new_dic[0][1][1]['rotate']), int(new_dic[0][1][1]['power']))
             print('nb tours ' + str(j), file=sys.stderr, flush=True)
 
@@ -57,12 +51,12 @@ class MarsSim:
         self.sim_to_dict(0)
 
     def sim_to_dict(self, loop):
-
         dict_variable = {'periode': self.periode, 'X': self.x, 'Y': self.y, 'hSpeed': self.hs, 'vSpeed': self.vs,
                          'fuel': self.fuel, 'rotate': self.rotate, 'power': self.power}
         self.dico_atterissage[loop] = dict_variable
 
 
+# Construction d'un plateau sous forme plateau = [[x0,y0],[x1,y1],...,[xn,yn]]
 def construction_plateau_bis(data):
     plateau = []
     taille = len(data)
@@ -94,14 +88,12 @@ def construction_plateau_bis(data):
 def lancementV2(simulationEnCours: MarsSim, save_try):
     loop = 0
     sim = simulationEnCours
-    while check_contraintes(sim.dico_atterissage[loop]) and loop < 2:
+    # trouve le meilleur résultat pour un nombre de pas
+    nb_pas = 2
+    while check_contraintes(sim.dico_atterissage[loop]) and loop < nb_pas:
         new_rotate, new_power = newSimulationV2(save_try, loop, sim)
         sim = simulationV2(sim, new_power, new_rotate)
         sim.sim_to_dict(loop + 1)
-        """
-        if loop > 2:
-            sim.random = False
-        """
         if succes is True:
             break
         loop += 1
@@ -109,56 +101,94 @@ def lancementV2(simulationEnCours: MarsSim, save_try):
 
 
 def evaluationV2(simulationEnCours: MarsSim):
-    # variables_fin = dict_global[len(dict_global) - 2]
     global plateau
 
     var = plateau[0].index(int(simulationEnCours.x))
-    # rajouter ca pour le 5 ?? plateau[1][var[0][0]] mais apres bug sur les sorties de plateau
 
+    # on resgarde si on est toujours dans les limites du jeux
     if simulationEnCours.x <= 0 or simulationEnCours.x >= 6999 or simulationEnCours.y <= 0 or simulationEnCours.y >= 2999:
         return 100000
+
+    # on resgarde à quelle distance on se situe du sol
     if simulationEnCours.y < plateau[1][var]:
         distance_altitude_point = 0
     else:
         distance_altitude_point = abs(plateau[1][var] - simulationEnCours.y)
 
-    # créer une fonction pour trouver le début et la fin de la zone d'aterissage par rapport au tableau plateau
+    # on resgarde notre distance par rapport à la zone d'aterissage
     zone_atterissage_debut, zone_atterissage_fin = zoneAtterissagebis()
     zone_parfaite = zone_atterissage_debut + zone_atterissage_fin / 2
-    if (zone_atterissage_fin+50) > simulationEnCours.x > (zone_atterissage_debut-50):
-        # var_parfaite = np.where(coordonnee == zone_parfaite)
-        # distance_zone_aterissage = abs(var[0][0] - var_parfaite[0][0])
+    if (zone_atterissage_fin - 10) > simulationEnCours.x > (zone_atterissage_debut + 10):
         distance_zone_aterissage = 0
-        #print('Bon endroit', file=sys.stderr, flush=True)
-
     else:
         var_debut = plateau[0].index(int(zone_parfaite))
         distance_zone_aterrisage_debut = abs(var - var_debut)
         var_fin = var_debut
         distance_zone_aterrisage_fin = abs(var - var_fin)
-        distance_zone_aterissage = min([distance_zone_aterrisage_debut, distance_zone_aterrisage_fin]) * 200
-        #print('distance zone ' + str(distance_zone_aterissage), file=sys.stderr, flush=True)
+        distance_zone_aterissage = min([distance_zone_aterrisage_debut, distance_zone_aterrisage_fin]) * 500
 
-    if abs(simulationEnCours.vs) >= 20:
-        distance_vspeed = (abs(simulationEnCours.vs) - 20) * 3000
+    # on s'il y a un point élevé entre nous et la zone d'aterissage
+    if var < zone_atterissage_debut:
+        carte_hauteurs_fuse_aterissage = sorted(plateau[1][int(var):int(zone_atterissage_debut)], reverse=True)
     else:
-        distance_vspeed = 0
-    if abs(simulationEnCours.hs) >= 18:
-        distance_hspeed = (abs(simulationEnCours.hs) - 18) * 1000
-        #print('distance speed '+ str(distance_hspeed), file=sys.stderr, flush=True)
+        carte_hauteurs_fuse_aterissage = sorted(plateau[1][int(zone_atterissage_fin):int(var)], reverse=True)
+    if simulationEnCours.x - 50 > zone_atterissage_fin or simulationEnCours.x + 50 < zone_atterissage_debut:
+        if simulationEnCours.y - 600 < carte_hauteurs_fuse_aterissage[0]:
+            test = 0
+        else:
+            test = 1
     else:
-        distance_hspeed = 0
-        #print('distance speed '+ str(distance_hspeed), file=sys.stderr, flush=True)
-    if simulationEnCours.rotate != 0:
-        distance_rotate = (abs(simulationEnCours.rotate)) * 50
+        test = 1
+
+    # en fonction de la situation (point élevé entre nous et l'aterissage / au dessus de la zone d'aterissage) on définit les poids pour l'évaluation
+    if test == 0:
+        if distance_zone_aterissage == 0:
+            if abs(simulationEnCours.vs) >= 30:
+                distance_vspeed = (abs(simulationEnCours.vs) - 30) * 3000
+            else:
+                distance_vspeed = 0
+            if abs(simulationEnCours.hs) >= 19:
+                distance_hspeed = (abs(simulationEnCours.hs) - 19) * 1000
+
+            else:
+                distance_hspeed = 0
+            if simulationEnCours.rotate != 0:
+                distance_rotate = (abs(simulationEnCours.rotate)) * 1000
+            else:
+                distance_rotate = 0
+            distance_fin = distance_rotate + distance_hspeed + distance_vspeed
+        else:
+            if abs(simulationEnCours.vs) >= 1:
+                distance_vspeed = (abs(simulationEnCours.vs) - 1) * 3000
+            else:
+                distance_vspeed = 0
+            if abs(simulationEnCours.hs) >= 25:
+                distance_hspeed = (abs(simulationEnCours.hs) - 25) * 1000
+            else:
+                distance_hspeed = 0
+            if simulationEnCours.rotate != 0:
+                distance_rotate = (abs(simulationEnCours.rotate)) * 50
+            else:
+                distance_rotate = 0
+            distance_fin = distance_rotate + distance_hspeed + distance_vspeed
     else:
-        distance_rotate = 0
-    distance_fin = distance_rotate + distance_hspeed + distance_vspeed
+        if abs(simulationEnCours.vs) >= 30:
+            distance_vspeed = (abs(simulationEnCours.vs) - 30) * 3000
+        else:
+            distance_vspeed = 0
+        if abs(simulationEnCours.hs) >= 18:
+            distance_hspeed = (abs(simulationEnCours.hs) - 18) * 1500
+        else:
+            distance_hspeed = 0
+        if simulationEnCours.rotate != 0:
+            distance_rotate = (abs(simulationEnCours.rotate)) * 50
+        else:
+            distance_rotate = 0
+        distance_fin = distance_rotate + distance_hspeed + distance_vspeed
     distance_totale = distance_altitude_point + distance_zone_aterissage + distance_fin
-
     return distance_totale
 
-
+# vérification des contraintes imposées
 def check_contraintes(dict_varaible):
     if dict_varaible['X'] <= 0 or dict_varaible['X'] > 7000:
         print('erreur X', file=sys.stderr, flush=True)
@@ -178,9 +208,8 @@ def check_contraintes(dict_varaible):
         return False
     else:
         return True
-        # rajouter vérif de si on se pose de l'angle et la vitesse
 
-
+# simulation qui retourne selon le power et le rotate, donne la nouvelle position et vitesse de la fusée
 def simulationV2(simulationEnCours: MarsSim, power, rotate):
     x = simulationEnCours.x
     y = simulationEnCours.y
@@ -220,13 +249,15 @@ def simulationV2(simulationEnCours: MarsSim, power, rotate):
 
     return simulationEnCours
 
-
+# définition de la vitesse et du power à envoyer
 def newSimulationV2(save_try, periode, simulation_en_cours: MarsSim):
+    # Aléatoire si nouvelle simulation
     if simulation_en_cours.random:
         new_rotate = random.randrange(-90, 90, 5)
-        new_power = random.randint(3, 4)
+        new_power = random.randint(0, 4)
     else:
-        print('pas random total' , file=sys.stderr, flush=True)
+        # bassé sur le meilleurs score obtenue lors des essais précédents
+        print('pas random total', file=sys.stderr, flush=True)
         if periode in save_try[simulation_en_cours.best_score]:
             alea = random.randint(0, 9)
             if simulation_en_cours.taux_tour * 10 > alea:
@@ -241,7 +272,7 @@ def newSimulationV2(save_try, periode, simulation_en_cours: MarsSim):
 
     return new_rotate, new_power
 
-
+# trouve la zone d'aterissage de la fusée
 def zoneAtterissagebis():
     global plateau
     begin_flat = 0
@@ -256,9 +287,6 @@ def zoneAtterissagebis():
 
     return begin_flat, end_flat
 
-    # Press the green button in the gutter to run the script.
-
-
 n = int(input())
 surfaces = []
 for i in range(n):
@@ -271,17 +299,5 @@ succes = False
 
 # game loop
 while True:
-    # hs: the horizontal speed (in m/s), can be negative.
-    # vs: the vertical speed (in m/s), can be negative.
-    # f: the quantity of remaining fuel in liters.
-    # r: the rotation angle in degrees (-90 to 90).
-    # p: the thrust power (0 to 4).
-
     simulation = MarsSim(input())
     start_time = time.time()
-
-    # Write an action using print
-    # To debug: print("Debug messages...", file=sys.stderr, flush=True)
-
-    # R P. R is the desired rotation angle. P is the desired thrust power.
-    # print("-20 3")

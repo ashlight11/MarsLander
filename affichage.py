@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 
-
-
+# comme pour la partie codding game
 def construction_plateau_bis(data):
     plateau = []
     taille = len(data)
@@ -30,7 +29,7 @@ def construction_plateau_bis(data):
 
     return plateau
 
-
+# affichage en plot des trajectoire de chacun des essais
 def affichageV2(plateau, tracex, tracey, succes, best_score):
     plt.xlim(0, 7000)
     plt.ylim(0, 3000)

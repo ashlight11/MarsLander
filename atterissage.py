@@ -8,7 +8,7 @@ from affichage import affichageV2
 
 succes = False
 
-
+# vérification des contraites et de la réussite ou non de l'aterissage
 def check_contraintes(dict_varaible, plateau):
     # print("check : ", dict_varaible)
     if dict_varaible['X'] <= 0 or dict_varaible['X'] > 7000:
@@ -84,7 +84,7 @@ def check_contraintes(dict_varaible, plateau):
             return True
         # rajouter vérif de si on se pose de l'angle et la vitesse
 
-
+# comme pour la partie codding game
 def simulationV2(simulationEnCours: MarsLanderSim, power, rotate):
     x = simulationEnCours.x
     y = simulationEnCours.y
@@ -126,7 +126,7 @@ def simulationV2(simulationEnCours: MarsLanderSim, power, rotate):
     simulationEnCours.tracey.append(simulationEnCours.y)
     return simulationEnCours
 
-
+# comme pour la partie codding game
 def lancementV2(simulationEnCours: MarsLanderSim, save_try):
     tracex = []
     tracey = []
@@ -153,17 +153,7 @@ def lancementV2(simulationEnCours: MarsLanderSim, save_try):
     return evaluationV2(sim), sim, succes
 
 
-"""def zoneAtterissage(plateau):
-    begin_flat = 0
-    end_flat = 0
-    for index, element in enumerate(plateau):
-        if index != len(plateau) - 1 and element[1] == plateau[index + 1][1]:
-            begin_flat = element
-            end_flat = plateau[index + 1]
-
-    return begin_flat, end_flat """
-
-
+# comme pour la partie codding game
 def zoneAtterissagebis(plateau):
     begin_flat = 0
     end_flat = 0

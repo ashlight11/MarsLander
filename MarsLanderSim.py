@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import atterissage as att
 from affichage import construction_plateau_bis
 
-
+# comme pour la partie codding game
 class MarsLanderSim:
     def __init__(self, plateau, init_data, nb_essais=1000, nb_atterissages=20, taux=0.5):
 
@@ -52,7 +52,6 @@ class MarsLanderSim:
             print("X = ", save_try[self.best_score][len(save_try[self.best_score]) - 1]['X'])
             print("nb_tours = ", i)
             test = self.tracex
-            # affichageV2(plateau,self.tracex,self.tracey)
             if succes:
                 plt.pause(20)
                 break
@@ -62,7 +61,6 @@ class MarsLanderSim:
     def perform_init(self, init_data):
         self.periode = 0
         self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power = [int(i) for i in init_data.split()]
-        # print(self.x, self.y, self.hs, self.vs, self.fuel, self.rotate, self.power)
         self.dico_atterissage = {}
         self.sim_to_dict(0)
 
@@ -74,7 +72,7 @@ class MarsLanderSim:
         self.dico_atterissage[loop] = dict_variable
 
 
-# Press the green button in the gutter to run the script.
+# définition des différents plateaux et lancement de la simulation
 if __name__ == '__main__':
     input_first = "5000 2500 -50 0 1000 0 0"  # (X Y hSpeed vSpeed fuel rotate power)
     ground = [(0, 1500), (1000, 2000), (2000, 500), (3500, 500), (5000, 1500), (6999, 1000)]
